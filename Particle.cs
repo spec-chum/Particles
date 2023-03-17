@@ -4,16 +4,16 @@ using System;
 
 namespace Explosion
 {
-    public class Particle
+    public struct Particle
     {
-        public Texture2D Texture;
+        public readonly Texture2D Texture;
+        public readonly Vector2 Velocity;
+        public readonly Vector2 Origin;
+        public readonly float Rotation;
+        public readonly float LifeTime;
+        public readonly float Scale;
         public Vector2 Position;
-        public Vector2 Velocity;
-        public Vector2 Origin;
         public Color Color;
-        public float Rotation;
-        public float LifeTime;
-        public float Scale;
         public bool IsActive;
 
         public Particle(Texture2D texture, Vector2 position, Vector2 velocity, Color color, float rotation, float lifeTime)
