@@ -12,7 +12,11 @@ namespace Explosion
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private List<Particle> _particles;
+        private MouseState _mouseState;
         private MouseState _prevMouseState;
+
+        float[] fpsHistory = new float[4];
+        int fpsIndex = 0;
 
         public Game1()
         {
@@ -49,22 +53,32 @@ namespace Explosion
                 Exit();
             }
 
+            float elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            float currentFps = 1 / elapsedSeconds;
+
+            fpsHistory[fpsIndex] = currentFps;
+            fpsIndex = (fpsIndex + 1) % fpsHistory.Length;
+
+            float smoothedFps = (fpsHistory[0] + fpsHistory[1] + fpsHistory[2] + fpsHistory[3]) / 4;
+
+            Window.Title = $"Particles {smoothedFps:F2}";
+
             UpdateParticles(gameTime);
 
-            var mouseState = Mouse.GetState();
-            if (mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released)
+            _mouseState = Mouse.GetState();
+            if (_mouseState.LeftButton == ButtonState.Pressed && _prevMouseState.LeftButton == ButtonState.Released)
             {
-                mouseState = GenerateNewParticles(mouseState);
+                GenerateNewParticles();
             }
 
-            _prevMouseState = mouseState;
+            _prevMouseState = _mouseState;
 
             base.Update(gameTime);
         }
 
-        private MouseState GenerateNewParticles(MouseState mouseState)
+        private void GenerateNewParticles()
         {
-            Vector2 origin = mouseState.Position.ToVector2();
+            Vector2 origin = _mouseState.Position.ToVector2();
 
             for (int i = 0; i < 1000; i++)
             {
@@ -74,8 +88,6 @@ namespace Explosion
 
                 _particles.Add(new Particle(Content.Load<Texture2D>("particle"), origin, velocity, Color.BlueViolet, rotation, 1f / (float.Epsilon + Random.Shared.NextSingle())));
             }
-
-            return mouseState;
         }
 
         private void UpdateParticles(GameTime gameTime)
